@@ -385,7 +385,7 @@ $width: 85%;
             padding: 10px;
             font-family: Noto Sans Malayalam;
             font-weight: 700;
-            line-height: 39px;
+            line-height: 5vh;
             text-align: center;
           }
         }
@@ -433,9 +433,9 @@ $width: 85%;
     display: none;
   }
   .message {
-    font-family: 'DG-3asomy-Regular';
+    font-family: "DG-3asomy-Regular";
     text-transform: uppercase;
-    font-size:5rem;
+    font-size: 5rem;
   }
 }
 .pop-overlay {

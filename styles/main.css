@@ -436,7 +436,7 @@ a {
   padding: 10px;
   font-family: Noto Sans Malayalam;
   font-weight: 700;
-  line-height: 39px;
+  line-height: 5vh;
   text-align: center;
 }
 .game .body .body-wrapper .cards .card-item {
