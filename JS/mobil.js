@@ -46,7 +46,7 @@ infoIcon.addEventListener("click", () => {
 scoreElements();
 const scoreSpans = document.querySelectorAll(".scoreItem .items .part");
 
-playButton.addEventListener('click' , ()=>{
+playButton.addEventListener('touchstart' , ()=>{
   console.log("start");
   openFullscreen();
   document.querySelector("#start-audio").play();
@@ -61,16 +61,16 @@ playButton.addEventListener('click' , ()=>{
     pauseButton.style.visibility = "visible";
     cardItems[questionsShow].classList.add("show");
     isRunning = true;
-    // startTimer();
-    //  if (!isRunning) {
-    //    startTimer();
-    //  } else {
-    //    stopTimer();
-    //  }
+     startTimer();
+      if (!isRunning) {
+        startTimer();
+      } else {
+        stopTimer();
+      }
 }) 
 })
 
-pauseButton.addEventListener("click", () => {
+pauseButton.addEventListener("touchstart", () => {
   const hiddenIcon = pauseButton.querySelector("i.hide");
   const shownIcon = pauseButton.querySelector("i:not(.hide)");
   hiddenIcon.classList.remove("hide");
@@ -85,7 +85,7 @@ pauseButton.addEventListener("click", () => {
 });
 cardsText.forEach((card) => {
   
-  card.addEventListener("click", (e) => {
+  card.addEventListener("touchstart", (e) => {
     console.log("card  clicked");
     //CHECK ANSWERS
      var question_by_id = document.getElementById(
@@ -218,24 +218,24 @@ function animateNextQuestion() {
     cardItems[questionsShow].classList.add("show");
 }
 
-// function myTimer() {
-//   if (!isRunning) {
-//     timerInterval = setInterval(function () {
-//       theTimer++;
-//       console.log("the timer is work....");
-//       console.log(theTimer);
-//     }, 1000);
-//     isRunning = true;
-//   }
-// }
+function startTimer() {
+  if (!isRunning) {
+    timerInterval = setInterval(function () {
+      theTimer++;
+      console.log("the timer is work....");
+      console.log(theTimer);
+    }, 1000);
+    isRunning = true;
+  }
+}
 
-// function stopTimer() {
-//   clearInterval(timerInterval);
-//   console.log("the timer is stopped....");
-//   isRunning = false;
-// }
-// myTimer()
 
+
+function stopTimer() {
+  clearInterval(timerInterval);
+  console.log("the timer is stopped....");
+  isRunning = false;
+}
 
 function scoreElements(){
   

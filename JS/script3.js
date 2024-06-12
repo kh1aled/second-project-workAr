@@ -15,7 +15,6 @@ const successModal = document.querySelector(".success-wrapper");
 const arrows = document.querySelectorAll(".game .body .arrow");
 const pauseButton = document.querySelector(".game .pause.icon");
 const scoreItem = document.querySelector(".scoreItem .items");
-let answers = 0;
 
 const iconsArr = [...arrows, pauseButton];
 
@@ -24,7 +23,7 @@ let animationCounter = 0,
   theTimer = 0,
   timerInterval,
   counter = 0,
-  trueAnswers = 0;
+  trueAnswers = 0,
   textCounter = 0,
   wrongAnswers = 0,
   questionsShow = 0;
@@ -46,7 +45,7 @@ infoIcon.addEventListener("click", () => {
 scoreElements();
 const scoreSpans = document.querySelectorAll(".scoreItem .items .part");
 
-playButton.addEventListener('click' , ()=>{
+playButton.addEventListener("click", debounce(() => {
   console.log("start");
   openFullscreen();
   document.querySelector("#start-audio").play();
@@ -60,88 +59,60 @@ playButton.addEventListener('click' , ()=>{
     body.classList.add("show");
     pauseButton.style.visibility = "visible";
     cardItems[questionsShow].classList.add("show");
-    isRunning = true;
-     startTimer();
-      if (!isRunning) {
-        startTimer();
-      } else {
-        stopTimer();
-      }
-}) 
-})
+    if (!isRunning) {
+      startTimer();
+    } else {
+      stopTimer();
+    }
+  });
+} , 500 ));
 
 pauseButton.addEventListener("click", () => {
+  console.log("paused");
   const hiddenIcon = pauseButton.querySelector("i.hide");
   const shownIcon = pauseButton.querySelector("i:not(.hide)");
   hiddenIcon.classList.remove("hide");
   shownIcon.classList.add("hide");
   pausedOverlay.classList.toggle("hide");
-
-   if (isRunning) {
-    isRunning = false;
-   } else {
-    isRunning = true;
-   }
+  if (isRunning) {
+    stopTimer();
+  } else {
+    startTimer();
+  }
 });
+
 cardsText.forEach((card) => {
-  
-  card.addEventListener("click", (e) => {
-    answers++;
-
-    var xhr = new XMLHttpRequest();
-
-
-    xhr.open('POST', '/update-database', true);
-
-    xhr.setRequestHeader('Content-Type', 'application/json');
-
-    xhr.send(JSON.stringify({ newValue: answers }));
-
-    // تحديد ماذا يحدث عند استلام الرد من الخادم
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === XMLHttpRequest.DONE) {
-            if (xhr.status === 200) {
-                console.log('تم تحديث البيانات بنجاح', xhr.responseText);
-            } else {
-                console.error('حدث خطأ أثناء تحديث البيانات');
-            }
-        }
-    };
-    console.log("card  clicked");
+  card.addEventListener("click", debounce((e) => {
+    console.log("card clicked");
     //CHECK ANSWERS
-     var question_by_id = document.getElementById(
-       `q_${e.target.dataset.number}`
-     );
+    var question_by_id = document.getElementById(`q_${e.target.dataset.number}`);
 
     //IF ANSWER IS TRUE
     if (card.dataset.status === "true") {
       question_by_id.classList.add("true");
       trueAnswers++;
-      scoreSpans.forEach((span)=>{
-        if(e.target.dataset.number === span.id){
+      scoreSpans.forEach((span) => {
+        if (e.target.dataset.number === span.id) {
           span.classList.add("true");
         }
-      })
-          document.querySelector("#start-audio").play();
+      });
+      document.querySelector("#start-audio").play();
     }
     //IF ANSWER IS FALSE
     else {
-      scoreSpans.forEach((span)=>{
-        if(e.target.dataset.number === span.id){
+      scoreSpans.forEach((span) => {
+        if (e.target.dataset.number === span.id) {
           span.classList.add("false");
         }
-      })
+      });
       document.querySelector("#start-audio").play();
       question_by_id.classList.add("false");
       wrongAnswers++;
     }
     counter++;
     questionsShow++;
-    document.querySelector(
-      ".score"
-    ).textContent = `${counter}/${cardItems.length}`;
+    document.querySelector(".score").textContent = `${counter}/${cardItems.length}`;
     //SHOW THE NEXT QUESTION
-    
     if (questionsShow === cardItems.length) {
       const text = document.querySelector(".text-card .score-text");
       text.textContent = `${trueAnswers}/${cardItems.length}`;
@@ -159,7 +130,7 @@ cardsText.forEach((card) => {
         animateNextQuestion();
       }, 500);
     }
-  });
+  }, 500)); // تأخير الحدث لمدة 500 ميلي ثانية (نصف ثانية)
 });
 
 const hideItems = () => {
@@ -177,7 +148,7 @@ const resetTimer = () => {
 };
 
 document.addEventListener("mousemove", resetTimer);
-document.addEventListener("touchstart", resetTimer);
+document.addEventListener("click", resetTimer);
 const checkScreen = () => {
   const isPortrait = window.matchMedia("(orientation: portrait)").matches;
   const isMobile = window.innerWidth < 768 && isPortrait;
@@ -224,15 +195,11 @@ function openFullscreen() {
   if (elem.requestFullscreen) {
     elem.requestFullscreen();
   } else if (elem.webkitRequestFullscreen) {
-    /* Safari */
     elem.webkitRequestFullscreen();
   } else if (elem.msRequestFullscreen) {
-    /* IE11 */
     elem.msRequestFullscreen();
-  }else if(elem.mozRequestFullscreen){
-    elem.mozRequestFullscreen();
-  }else if(elem.webkitEnterFullscreen){
-    elem.webkitEnterFullscreen();
+  } else if (elem.webkitRequestFullScreen) { /* for iOS Safari */
+    elem.webkitRequestFullScreen();
   }
 }
 
@@ -240,7 +207,7 @@ function animateNextQuestion() {
   cardItems.forEach((card) => {
     card.classList.remove("show");
   });
-    cardItems[questionsShow].classList.add("show");
+  cardItems[questionsShow].classList.add("show");
 }
 
 function startTimer() {
@@ -262,36 +229,36 @@ function stopTimer() {
   isRunning = false;
 }
 
-function scoreElements(){
-  
-  for(let i = 1 ;i <= cardItems.length ; i++ ){
+
+function scoreElements() {
+  for (let i = 1; i <= cardItems.length; i++) {
     let span = document.createElement("span");
     span.id = `${i}`;
     span.className = "part";
     span.style.width = `${100 / cardItems.length}%`;
-    if(i==cardItems.length){
-      span.style.borderTopRightRadius= "10px";
-      span.style.borderBottomRightRadius= "10px";
+    if (i == cardItems.length) {
+      span.style.borderTopRightRadius = "10px";
+      span.style.borderBottomRightRadius = "10px";
     }
     scoreItem.appendChild(span);
   }
 }
 
-function loadScript(src){
-  var script = document.querySelector(".script");
-  console.log(script);
-  script.src = src;
-  script.async = true;
-  document.head.appendChild(script);
+function debounce(func, delay) {
+  let timer;
+  return function () {
+    const context = this;
+    const args = arguments;
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      func.apply(context, args);
+    }, delay);
+  };
 }
 
-function checkScript(){
-  if('ontouchstart' in window){
-    loadScript('./JS/mobil.js');
-    console.log("mobil");
-  }else{
-    loadScript('./JS/script.js');
-    console.log('computer');
-  }
-}
-checkScript();
+// تعيين debounce function للحدث
+document.addEventListener("touchstart", resetTimer);
+
+document.addEventListener("touchstart", debounce((e) => {
+  console.log("touch event occurred");
+}, 500)); // تأخير الحدث لمدة 500 ميلي ثانية (نصف ثانية)
